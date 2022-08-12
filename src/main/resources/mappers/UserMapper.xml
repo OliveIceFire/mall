@@ -126,4 +126,20 @@
       email_address = #{emailAddress,jdbcType=VARCHAR}
     where id = #{id,jdbcType=INTEGER}
   </update>
+
+  <select id="selectByName" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from mall_user
+    where username = #{username,jdbcType=VARCHAR}
+  </select>
+
+  <select id="selectLogin" parameterType="map" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from mall_user
+    where username = #{username,jdbcType=VARCHAR}
+    and `password` = #{password,jdbcType=VARCHAR}
+  </select>
+
 </mapper>
