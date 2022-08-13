@@ -43,7 +43,7 @@ public class CategoryController {
         if (!adminRole) {
             return ApiRestResponse.error(MallExceptionEnum.NEED_ADMIN);
 
-        }else {
+        } else {
             categoryService.add(req);
             return ApiRestResponse.success();
         }
@@ -61,13 +61,14 @@ public class CategoryController {
         if (!adminRole) {
             return ApiRestResponse.error(MallExceptionEnum.NEED_ADMIN);
 
-        }else {
+        } else {
             Category category = new Category();
             BeanUtils.copyProperties(updateCategoryReq, category);
             categoryService.update(category);
             return ApiRestResponse.success();
         }
     }
+
     @ApiOperation("后台删除目录")
     @PostMapping("admin/category/delete")
     public ApiRestResponse deleteCategory(@RequestParam("id") Integer id) {
@@ -88,6 +89,5 @@ public class CategoryController {
         List<CategoryVO> categoryVOS = categoryService.listCategoryForCustomer(0);
         return ApiRestResponse.success(categoryVOS);
     }
-
 
 }
