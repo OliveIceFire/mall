@@ -141,5 +141,11 @@
     where username = #{username,jdbcType=VARCHAR}
     and `password` = #{password,jdbcType=VARCHAR}
   </select>
-
+  <select id="selectOneByEmailAddress" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from mall_user
+    where email_address = {#email_address}
+    limit 1
+  </select>
 </mapper>

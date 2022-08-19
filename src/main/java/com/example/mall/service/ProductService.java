@@ -6,6 +6,7 @@ import com.example.mall.model.request.ProductListReq;
 import com.github.pagehelper.PageInfo;
 
 import java.io.File;
+import java.io.IOException;
 
 public interface ProductService {
 
@@ -23,5 +24,5 @@ public interface ProductService {
 
     PageInfo list(ProductListReq productListReq);
 
-    void addProductByExcel(File destFile);
+    void addProductByExcel(File destFile) throws IOException;
 }

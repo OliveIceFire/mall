@@ -3,6 +3,7 @@ package com.example.mall.controller;
 import com.example.mall.common.ApiRestResponse;
 import com.example.mall.common.Constant;
 import com.example.mall.exception.MallExceptionEnum;
+import com.example.mall.filter.UserFilter;
 import com.example.mall.model.entity.Category;
 import com.example.mall.model.entity.User;
 import com.example.mall.model.request.AddCategoryReq;
@@ -34,8 +35,8 @@ public class CategoryController {
     @ApiOperation("添加分类")
     @PostMapping("admin/category/add")
     public ApiRestResponse addCategory(HttpSession session, @Valid @RequestBody AddCategoryReq req) {
-        User currentUser = (User) session.getAttribute(Constant.MALL_USER);
-//        User currentUser = UserFilter.currentUser;
+//        User currentUser = (User) session.getAttribute(Constant.MALL_USER);
+        User currentUser = UserFilter.currentUser;
         if (currentUser == null) {
             return ApiRestResponse.error(MallExceptionEnum.NEED_LOGIN);
         }
@@ -52,8 +53,8 @@ public class CategoryController {
     @ApiOperation("更新分类")
     @PostMapping("admin/category/update")
     public ApiRestResponse updateCategory(@Valid @RequestBody UpdateCategoryReq updateCategoryReq, HttpSession session) {
-        User currentUser = (User) session.getAttribute(Constant.MALL_USER);
-//        User currentUser = UserFilter.currentUser;
+//        User currentUser = (User) session.getAttribute(Constant.MALL_USER);
+        User currentUser = UserFilter.currentUser;
         if (currentUser == null) {
             return ApiRestResponse.error(MallExceptionEnum.NEED_LOGIN);
         }
@@ -77,7 +78,7 @@ public class CategoryController {
     }
 
     @ApiOperation("后台获取目录列表")
-    @PostMapping("admin/category/list")
+    @GetMapping("admin/category/list")
     public ApiRestResponse listCategoryForAdmin(@RequestParam Integer pageNum, @RequestParam Integer pageSize) {
         PageInfo pageInfo = categoryService.listForAdmin(pageNum, pageSize);
         return ApiRestResponse.success(pageInfo);

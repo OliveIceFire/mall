@@ -13,9 +13,17 @@ public class Constant {
     public static final String MALL_USER = "mall_user";
 
     public static final String SALT = "8SKLJ;L,090";
+    public static final String EMAIL_SUBJECT = "验证码";
+    public static final String EMAIL_FROM = "979215868@qq.com";
 
+    //jwt
+    public static final String JWT_KEY = "JWT_KEY";
+    public static final String JWT_TOKEN = "jwt_token";
+    public static final String USER_ID = "user_id";
+    public static final String USER_NAME = "user_name";
+    public static final String USER_ROLE = "user_role";
+    public static final Long EXPIRE_TIME = 60 * 1000 * 60 * 24 * 1000L;//单位是毫秒//开发环境//不合理
     public static String FILE_UPLOAD_DIR;
-
 
     @Value("${file.upload.path}")
     public void setFileUploadDir(String fileUploadDir) {
@@ -23,11 +31,7 @@ public class Constant {
     }
 
     public enum OrderStatusEnum {
-        CANCELED(0, "用户已取消"),
-        NOT_PAID(10, "未付款"),
-        PAID(20, "已付款"),
-        DELIVERED(30, "已发货"),
-        FINISHED(40, "交易完成");
+        CANCELED(0, "用户已取消"), NOT_PAID(10, "未付款"), PAID(20, "已付款"), DELIVERED(30, "已发货"), FINISHED(40, "交易完成");
 
         private String value;
         private int code;

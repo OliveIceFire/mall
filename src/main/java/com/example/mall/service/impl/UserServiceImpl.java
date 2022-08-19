@@ -20,13 +20,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void register(String username, String password) throws MallException {
+    public void register(String username, String password, String emailAddress) throws MallException {
         if (userMapper.selectByName(username) != null) {
             throw new MallException(MallExceptionEnum.NAME_EXISTED);
         }
 
         User user = new User();
         user.setUsername(username);
+        user.setEmailAddress(emailAddress);
         try {
             user.setPassword(MD5Utils.getMD5Str(password));
         } catch (Exception e) {
@@ -63,5 +64,11 @@ public class UserServiceImpl implements UserService {
     @Override
     public boolean checkAdminRole(User user){//2是管理员
         return user.getRole().equals(2);
+    }
+
+    @Override
+    public boolean checkEmailRegistered(String emailAddress){
+        User user = userMapper.selectOneByEmailAddress(emailAddress);
+        return user == null;
     }
 }

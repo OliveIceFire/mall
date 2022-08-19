@@ -1,6 +1,14 @@
 package com.example.mall.filter;
 
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.JWTVerifier;
+import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.exceptions.JWTDecodeException;
+import com.auth0.jwt.exceptions.TokenExpiredException;
+import com.auth0.jwt.interfaces.DecodedJWT;
 import com.example.mall.common.Constant;
+import com.example.mall.exception.MallException;
+import com.example.mall.exception.MallExceptionEnum;
 import com.example.mall.model.entity.User;
 import com.example.mall.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,21 +37,34 @@ public class UserFilter implements Filter {
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
         HttpServletRequest request = (HttpServletRequest) servletRequest;
-        HttpSession session = request.getSession();
-        currentUser = (User) session.getAttribute(Constant.MALL_USER);
-        if (currentUser == null) {
+//        HttpSession session = request.getSession();
+//        currentUser = (User) session.getAttribute(Constant.MALL_USER);
+        String token = request.getHeader(Constant.JWT_TOKEN);
+        if (token == null) {
             PrintWriter out = new HttpServletResponseWrapper((HttpServletResponse) servletResponse).getWriter();
             out.write("{\n"
-                    + "\"status\": 10007,\n"
-                    + "\"msg\": \"NEED_LOGIN\"\n"
-                    + "\"data\": null\n"
-                    + "}");
+                    +"\"status\": 10007,\n"
+                    +"\"msg\": \"NEED_JWT_TOKEN\"\n"
+                    +"\"data\": null\n"
+                    +"}");
             out.flush();
             out.close();
             return;
         }
-        filterChain.doFilter(servletRequest, servletResponse);
-
+        Algorithm algorithm = Algorithm.HMAC256(Constant.JWT_KEY);
+        JWTVerifier verifier = JWT.require(algorithm).build();
+        try {
+            DecodedJWT jwt = verifier.verify(token);
+            currentUser.setId(jwt.getClaim(Constant.USER_ID).asInt());
+            currentUser.setRole(jwt.getClaim(Constant.USER_ROLE).asInt());
+            currentUser.setUsername(jwt.getClaim(Constant.USER_NAME).asString());
+        } catch (TokenExpiredException e) {
+            //token过期，抛出异常
+            throw new MallException(MallExceptionEnum.TOKEN_EXPIRED);
+        } catch (JWTDecodeException e) {
+            //解码失败，抛出异常
+            throw new MallException(MallExceptionEnum.TOKEN_WRONG);
+        }
     }
 
     @Override

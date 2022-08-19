@@ -83,7 +83,6 @@ public class ProductAdminController {
     @ApiOperation("后台删除商品")
     @PostMapping("/admin/product/delete")
     public ApiRestResponse deleteProduct(@Valid @RequestBody Integer id) {
-        Product product = new Product();
         productService.delete(id);
         return ApiRestResponse.success();
     }
@@ -103,5 +102,29 @@ public class ProductAdminController {
         return ApiRestResponse.success(pageInfo);
     }
 
+    @ApiOperation("后台批量上传商品")
+    @PostMapping("/admin/upload/product")
+    public ApiRestResponse uploadProduct(@RequestParam("file") MultipartFile multipartFile) throws IOException {
+        String fileName = multipartFile.getOriginalFilename();
+        String suffixName = fileName.substring(fileName.lastIndexOf("."));
+        //
+        UUID uuid = UUID.randomUUID();
+        String newFileName = uuid + suffixName;
+        //创建文件
+        File fileDirectory = new File(Constant.FILE_UPLOAD_DIR);
+        File destFile = new File(Constant.FILE_UPLOAD_DIR + newFileName);
+        if (!fileDirectory.exists()) {
+            if (!fileDirectory.mkdir()) {
+                throw new MallException(MallExceptionEnum.MKDIR_FAILED);
+            }
+        }
+        try {
+            multipartFile.transferTo(destFile);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        productService.addProductByExcel(destFile);
+        return ApiRestResponse.success();
+    }
 
 }

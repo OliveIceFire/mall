@@ -24,7 +24,15 @@ public enum MallExceptionEnum {
     NO_ORDER(10020, "订单不存在"),
     NOT_YOUR_ORDER(10021, "订单不属于你"),
     WRONG_ORDER_STATUS(10022, "订单状态不符"),
-    SYSTEM_ERROR(20000, "系统异常，请从控制台或日志中查看具体错误信息");
+    SYSTEM_ERROR(20000, "系统异常，请从控制台或日志中查看具体错误信息"),
+    WRONG_EMAIL(20001, "邮箱错误"),
+    EMAIL_HAS_BEEN_REGISTERED(20002, "邮箱已经被注册了"),
+    EMAIL_HAS_BEEN_SEND(20003, "已经发送邮件"),
+    NEED_EMAIL_ADDRESS(20004, "需要邮件地址"),
+    NEED_VERIFICATION_CODE(20005, "需要验证码"),
+    WRONG_VERIFICATION_CODE(20006, "验证码错误"),
+    TOKEN_EXPIRED(10029, "token过期"),
+    TOKEN_WRONG(10030, "token解析失败");
 
     Integer code;
 
