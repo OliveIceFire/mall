@@ -2,6 +2,7 @@ package com.example.mall.controller;
 
 import com.example.mall.common.ApiRestResponse;
 import com.example.mall.common.Constant;
+import com.example.mall.common.ValidList;
 import com.example.mall.exception.MallException;
 import com.example.mall.exception.MallExceptionEnum;
 import com.example.mall.model.entity.Product;
@@ -10,24 +11,34 @@ import com.example.mall.model.request.UpdateProductReq;
 import com.example.mall.service.ProductService;
 import com.github.pagehelper.PageInfo;
 import io.swagger.annotations.ApiOperation;
+import net.coobird.thumbnailator.Thumbnails;
+import net.coobird.thumbnailator.geometry.Positions;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.List;
 import java.util.UUID;
 
 @RestController
+//@Validated
 public class ProductAdminController {
 
     @Autowired
     ProductService productService;
+
+    @Value("${file.upload.uri}")
+    String uri;
 
     @PostMapping("admin/product/add")
     public ApiRestResponse addProduct(@Valid @RequestBody AddProductReq addProductReq) {
@@ -43,21 +54,16 @@ public class ProductAdminController {
         String newFileName = uuid + suffixName;
         File fileDirectory = new File(Constant.FILE_UPLOAD_DIR);
         File destFile = new File(Constant.FILE_UPLOAD_DIR + newFileName);
-        if (!fileDirectory.exists()) {
-            if (!fileDirectory.mkdir()) {
-                throw new MallException(MallExceptionEnum.MKDIR_FAILED);
-            }
-        }
-        try {
-            file.transferTo(destFile);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        try {
-            return ApiRestResponse.success(getHost(new URI(httpServletRequest.getRequestURL() + "")) + "/images/" + newFileName);
-        } catch (URISyntaxException e) {
-            throw new RuntimeException(e);
-        }
+        createFile(file, fileDirectory, destFile);
+        String address = uri;
+        return ApiRestResponse.success("http://" + address + "/images/" + newFileName);
+//        try {
+//            return ApiRestResponse.success(getHost(new URI(httpServletRequest.getRequestURL() + "")) + "/images/" + newFileName);
+//        } catch (URISyntaxException e) {
+////            throw new RuntimeException(e);
+//            return ApiRestResponse.error(MallExceptionEnum.UPLOAD_FAILED);
+//        }
+
     }
 
     private URI getHost(URI uri) {
@@ -102,7 +108,7 @@ public class ProductAdminController {
         return ApiRestResponse.success(pageInfo);
     }
 
-    @ApiOperation("后台批量上传商品")
+    @ApiOperation("后台上传商品")
     @PostMapping("/admin/upload/product")
     public ApiRestResponse uploadProduct(@RequestParam("file") MultipartFile multipartFile) throws IOException {
         String fileName = multipartFile.getOriginalFilename();
@@ -113,6 +119,41 @@ public class ProductAdminController {
         //创建文件
         File fileDirectory = new File(Constant.FILE_UPLOAD_DIR);
         File destFile = new File(Constant.FILE_UPLOAD_DIR + newFileName);
+        createFile(multipartFile, fileDirectory, destFile);
+        productService.addProductByExcel(destFile);
+        return ApiRestResponse.success();
+    }
+
+    @ApiOperation("后台上传图片")
+    @PostMapping("/admin/upload/image")
+    public ApiRestResponse uploadImage(HttpServletRequest httpServletRequest, @RequestParam("file") MultipartFile file) throws IOException {
+        String filename = file.getOriginalFilename();
+        assert filename != null;
+        String suffixName = filename.substring(filename.lastIndexOf("."));
+        UUID uuid = UUID.randomUUID();
+        String newFileName = uuid.toString().substring(0, 5) + "_image_" + suffixName;
+        File fileDirectory = new File(Constant.FILE_UPLOAD_DIR);
+        File destFile = new File(Constant.FILE_UPLOAD_DIR + newFileName);
+        createFile(file, fileDirectory, destFile);
+        Thumbnails.of(destFile).size(Constant.IMAGE_SIZE, Constant.IMAGE_SIZE).
+                watermark(Positions.BOTTOM_RIGHT,
+//                        ImageIO.read(new File(Constant.FILE_UPLOAD_DIR + Constant.WATER_MARK_JPG)
+                        ImageIO.read(new File("image/watermark.jpg")
+
+                        ),
+                        Constant.IMAGE_OPACITY)
+                .toFile(Constant.FILE_UPLOAD_DIR + newFileName);
+        String address = uri;
+        return ApiRestResponse.success("http://" + address + "/images/" + newFileName);
+//        try {
+//            return ApiRestResponse.success(getHost(new URI(httpServletRequest.getRequestURL() + "")) + "/images/" + newFileName);
+//        } catch (URISyntaxException e) {
+////            throw new RuntimeException(e);
+//            return ApiRestResponse.error(MallExceptionEnum.UPLOAD_FAILED);
+//        }
+    }
+
+    private void createFile(MultipartFile multipartFile, File fileDirectory, File destFile) {
         if (!fileDirectory.exists()) {
             if (!fileDirectory.mkdir()) {
                 throw new MallException(MallExceptionEnum.MKDIR_FAILED);
@@ -123,8 +164,14 @@ public class ProductAdminController {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        productService.addProductByExcel(destFile);
-        return ApiRestResponse.success();
     }
 
+    @ApiOperation("后台批量更新商品")
+    @PostMapping("/admin/product/batchUpdate")
+    public ApiRestResponse batchUpdateProduct(@Valid @RequestBody ValidList<UpdateProductReq> updateProductReqList) {
+//        Product product = new Product();
+//        BeanUtils.copyProperties(updateProductReq, product);
+//        productService.update(product);
+        return ApiRestResponse.success();
+    }
 }

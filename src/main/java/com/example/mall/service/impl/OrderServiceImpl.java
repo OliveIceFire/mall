@@ -55,8 +55,11 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     OrderItemMapper orderItemMapper;
 
-    @Value("${file.upload.ip}")
-    String ip;
+//    @Value("${file.upload.ip}")
+//    String ip;
+
+    @Value("${file.upload.uri}")
+    String uri;
 
     @Transactional(rollbackFor = Exception.class)
     @Override
@@ -235,7 +238,8 @@ public class OrderServiceImpl implements OrderService {
 //        } catch (UnknownHostException e) {
 //            e.printStackTrace();
 //        }
-        String address = ip + ":" + request.getLocalPort();
+//        String address = ip + ":" + request.getLocalPort();
+        String address = uri;
         String payUrl = "http://" + address + "/pay?orderNo=" + orderNo;
         try {
             QRCodeGenerator.generateQRCodeImage(payUrl, 350, 350, Constant.FILE_UPLOAD_DIR + orderNo + ".png");

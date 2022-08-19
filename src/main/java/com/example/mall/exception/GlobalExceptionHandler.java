@@ -3,15 +3,17 @@ package com.example.mall.exception;
 import com.example.mall.common.ApiRestResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.bind.annotation.*;
 
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @RestControllerAdvice
 //拦截异常
@@ -50,5 +52,17 @@ public class GlobalExceptionHandler {
         }
         return ApiRestResponse.error(MallExceptionEnum.REQUEST_PARAM_ERROR.getCode(), list.toString());
     }
+
+//    @ExceptionHandler
+//    @ResponseStatus(HttpStatus.OK)
+//    public ApiRestResponse handle(ConstraintViolationException exception) {
+//        Set<ConstraintViolation<?>> violations = exception.getConstraintViolations();
+//        StringBuilder builder = new StringBuilder();
+//        for (ConstraintViolation<?> violation : violations) {
+//            builder.append(violation.getMessage());
+//            break;
+//        }
+//        return ApiRestResponse.error(MallExceptionEnum.REQUEST_PARAM_ERROR.getCode(), builder.toString());
+//    }
 
 }
