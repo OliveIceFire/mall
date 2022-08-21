@@ -26,7 +26,7 @@ public class SpringFoxConfig {
 
     private ApiInfo apiInfo() {
         return new ApiInfoBuilder()
-                .title("生鲜")
+                .title("mall")
                 .description("")
                 .termsOfServiceUrl("")
                 .build();
