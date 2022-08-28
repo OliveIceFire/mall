@@ -216,6 +216,10 @@
     from mall_order
     where order_no = #{orderNo}
   </select>
+  <resultMap id="listOrderStatisticsMap" type="com.example.mall.model.vo.OrderStatisticsVO">
+    <result column="days" jdbcType="TIMESTAMP" property="days"/>
+    <result column="amount" jdbcType="INTEGER" property="amount"/>
+  </resultMap>
 
   <select id="selectForCustomer" resultMap="BaseResultMap" parameterType="java.lang.Integer">
     select
